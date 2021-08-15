@@ -1,6 +1,8 @@
 import math
 from tkinter import *
 
+
+# classe criada apenas para ajudar em algumas contas de vetores 2d
 class Vector2d():
     def __init__(self, x, y):
         self.x = x
@@ -16,6 +18,8 @@ class Vector2d():
         return Vector2d(self.x + other.x, self.y + other.y)   
         
 
+# clase que garda as caracteristicas de cada segmento do robo
+# tais como: tamanho, os pontos de inicio e de fim.
 class Arm():
     def __init__(self, length, **kwargs):
         self.length = length
@@ -33,6 +37,8 @@ class Arm():
             self.base = Vector2d(kwargs['base_x'], kwargs['base_y'])
             self.begin = Vector2d(kwargs['base_x'], kwargs['base_y'])
         
+        # Ter um pai significa que  o segmento nao está ligado diretamente ao chao
+        # e sim ligado a outro segmento. Esse segmento no qual ele está ligado é o seu pai
         if 'parent' in kwargs:
             self.parent = kwargs['parent']
             self.base = self.parent.base
@@ -42,6 +48,7 @@ class Arm():
 
 
     def findEnd(self):
+        #calcula o ponto x e y do final do segmento do robo com base na posição inicial, tamanho e angulo do segmento.
         self.end.x = self.begin.x + self.length * math.cos(self.angle) * math.cos(self.angle2)
         self.end.y = self.begin.y + self.length * math.sin(self.angle)
         
@@ -69,7 +76,7 @@ class Arm():
         
         self.findEnd()
         
-        
+# o Robo é a clase que contém um grupo de segmentos e se encarrega de plota-los no canvas.       
 class Robot():
     def __init__(self, canvas, arm_size, base_x, base_y, **kwargs):
         self.canvas = canvas
@@ -87,12 +94,16 @@ class Robot():
         else:
             width = 5
 
+
+        # Vetor de "Arms", a classe descrita anterioramente
         self.arms = []
         self.arms.append(Arm(arm_size, base_x = base_x, base_y = base_y))
         self.arms.append(Arm(arm_size, parent = self.arms[0]))
 
         self.segments = []
         self.bearings = []
+
+        # Vetor de linas e circulos, que serão usados para plotas o robo na tela
         for i in range(2):
             self.segments.append(self.canvas.create_line(self.arms[i].begin.x, self.arms[i].begin.y,
                                                         self.arms[i].end.x, self.arms[i].end.y, fill = color, width = width))
@@ -100,19 +111,22 @@ class Robot():
                                                         self.arms[i].begin.x - 10, self.arms[i].begin.y - 10, fill = color, width = width))
 
         size = 60
+        # Plot da Base do robo
         self.support = self.canvas.create_rectangle(self.base.x + size/2, self.base.y + size, self.base.x - size/2, self.base.y, fill = 'blue')
 
+    # A função que atualização a posição target do robo e atualiza o plot dele na tela
     def updateTarget(self, x, y):
-        angle = self.inverseKinematics(x, y)
+        angle = self.inverseKinematics(x, y) #Função que calcula os ângulos do robo com base na posição x e y 
         self.target.x = x
         self.target.y = y
         
+        # atualiza o plot na tela
         for i in range(len(self.arms)):
             self.arms[i].update(angle[i], self.angle)
             self.canvas.coords(self.segments[i], self.arms[i].begin.x, self.arms[i].begin.y, self.arms[i].end.x, self.arms[i].end.y)
             self.canvas.coords(self.bearings[i], self.arms[i].begin.x + 10, self.arms[i].begin.y + 10, self.arms[i].begin.x - 10, self.arms[i].begin.y - 10)
 
-
+    #Função que faz a cinemática inversa do robo, calculando os ângulos de suas juntas com base na posição x e y 
     def inverseKinematics(self, x, y):
         target = Vector2d(x, y)
         target_to_base = target - self.base
@@ -143,6 +157,8 @@ class Robot():
         return [teta_1, teta_2]
 
 
+    
+    # função que rotacionando o robo na tela.
     def rotate(self, size):
         angle = math.pi * size / (self.length * 50)
         self.angle += angle
@@ -153,7 +169,7 @@ class Robot():
         self.angle = angle
         self.updateTarget(self.target.x, self.target.y)
 
-
+    # função que atualiza apenas o angulo da primeira junta do robo
     def updateArm1(self, angle):
         aux = angle - self.arms[0].angle
         self.arms[0].update(angle, self.angle)
@@ -164,6 +180,7 @@ class Robot():
             self.canvas.coords(self.segments[i], self.arms[i].begin.x, self.arms[i].begin.y, self.arms[i].end.x, self.arms[i].end.y)
             self.canvas.coords(self.bearings[i], self.arms[i].begin.x + 10, self.arms[i].begin.y + 10, self.arms[i].begin.x - 10, self.arms[i].begin.y - 10)
 
+    # função que atualiza apenas o angulo da segunda junta do robo
     def updateArm2(self, angle):
         self.arms[1].update(angle, self.angle)
         self.target.x = self.arms[1].end.x
