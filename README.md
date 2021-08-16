@@ -39,4 +39,7 @@ Para desenvolver essa função nos baseamos nesse vídeo https://www.youtube.com
 
 
 # Código Embarcado
-O Código foi feito para a placa VIOLA da Toradex (Colibri VF50), decidimos usar a porta UART_A da placa para se comunicar com a nossa interface gráfica. Para setar as configurações da porta serial usamos a biblioteca <termios.h> e optamos por fazer um código que faz um eco do que foi recebido na serial, ou seja, ele reenvia os angulos targets enviados pela interface pela própria serial. Com os ângulos em mãos no código embarcado, os grupos responsáveis pelo controle do braço e envios dos dados pela rede can podem usar essas informação como target para a lógica de controle.
+O Código foi feito para a placa VIOLA da Toradex (Colibri VF50). 
+Decidimos usar a porta UART_A da placa para se comunicar com a nossa interface gráfica.
+Para setar as configurações da porta serial usamos a biblioteca <termios.h>.
+Optamos por fazer um código que faz um eco do que foi recebido na serial, ou seja, ele printa os ângulos enviados pela interface na própria serial. Com os ângulos em mãos no código embarcado, os grupos responsáveis pelo controle do braço e envios dos dados pela rede can podem usar essas informação como target para a lógica de controle.
