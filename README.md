@@ -30,9 +30,13 @@ Sendo a junta1 a mais próxima mda base azul.
 
 
 
-## Código
+## Código da interface
 O código é divido em 2 arquivos: main.py e robot.py.
 Na main.py temos a criação dos objetos da interface gráfica, a definição das rotinas de funcionamento de botões da interface e a criação do objeto da clase robot.
 Na robot.py temos 3 classes, a Vector2d, que serve apenas para ajudar em algumas contas com vetores 2D. A Arm, que cuida das propriedades de cada segmento do robô, sendo que ela pode ser o segmento principal ou ter "pais" associados. O pais são os segmentos no qual esse segmento está ligado.
 Por fim, temos a classe Robot, que possui um array de Arms e possui as funções de plot do robô no canvas. A principal função da da classe Robot é a inverseKinematics(), que permite calcular os ângulos das juntas do robô com base no TARGET.
 Para desenvolver essa função nos baseamos nesse vídeo https://www.youtube.com/watch?v=inSzWXAbM8Q&ab_channel=ReginaldoJSantos, onde o professor Reginaldo deriva as fórmulas que descrevem os ângulos.
+
+
+# Código Embarcado
+O Código foi feito para a placa VIOLA da Toradex (Colibri VF50), decidimos usar a porta UART_A da placa para se comunicar com a nossa interface gráfica. Para setar as configurações da porta serial usamos a biblioteca <termios.h> e optamos por fazer um código que faz um eco do que foi recebido na serial, ou seja, ele reenvia os angulos targets enviados pela interface pela própria serial. Com os ângulos em mãos no código embarcado, os grupos responsáveis pelo controle do braço e envios dos dados pela rede can podem usar essas informação como target para a lógica de controle.
